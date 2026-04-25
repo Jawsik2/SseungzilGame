@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고양이 엉덩이 두드리기</title>
+    <style>
+        body { text-align: center; font-family: sans-serif; user-select: none; }
+        #game-area { position: relative; display: inline-block; margin-top: 50px; }
+        #cat-image { width: 300px; cursor: pointer; transition: transform 0.3s; }
+        #score-board { position: absolute; top: 10px; left: 10px; font-size: 24px; font-weight: bold; }
+        #game-over-screen { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.9); flex-direction: column; justify-content: center; align-items: center;
+        }
+        #hiss-image { width: 100px; animation: zoomIn 0.5s forwards; }
+        @keyframes zoomIn { to { width: 400px; } }
+        button { margin-top: 20px; padding: 10px 20px; font-size: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="game-area">
+    <div id="score-board">두드린 횟수: <span id="score">0</span></div>
+    <img id="cat-image" src="https://postfiles.pstatic.net/MjAyNjA0MjVfMTYg/MDAxNzc3MTE0NTMxNjA2.UsvQ1YRhi8kYXBURsy65zNTAVQEpoGCHSjEjbvUaf08g.hs81l-ySKKTUR7osol0jR4my5RvKZ-R2mEhzbzzcBkAg.PNG/KakaoTalk_20260425_194851917.png?type=w3840" alt="고양이" onclick="tapCat()">
+    
+    <div id="game-over-screen">
+        <h1>Sseungzil win</h1>
+        <img id="hiss-image" src="https://postfiles.pstatic.net/MjAyNjA0MjVfMTQx/MDAxNzc3MTE0NTMwOTM4.-2Ls4nTES6tVACkd1lv50Snm25DRy7RLmsMIj_frbu8g.c67pI88s_zw08W4Plf1-MF5BhJAydGEhD-IShWCpSY4g.PNG/KakaoTalk_20260425_194851917_02.png?type=w3840" alt="하악질">
+        <button onclick="resetGame()">다시 두드리기</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let isLookingBack = false;
+    let turnTimer;
+    let safeTimer;
+
+    const catImg = document.getElementById('cat-image');
+    const scoreDisplay = document.getElementById('score');
+    const gameOverScreen = document.getElementById('game-over-screen');
+
+    function tapCat() {
+        if (isLookingBack) {
+            // 고양이가 돌아봤을 때 때림 -> 게임 오버
+            gameOver();
+        } else {
+            // 평소에 때림 -> 점수 증가
+            score++;
+            scoreDisplay.innerText = score;
+            // 엉덩이 때리는 시각적 효과 (살짝 흔들기)
+            catImg.style.transform = "scale(0.95)";
+            setTimeout(() => catImg.style.transform = "scale(1)", 100);
+        }
+    }
+
+    function randomTurn() {
+        // 2초 ~ 5초 사이 랜덤하게 돌아봄
+        let randomTime = Math.random() * 3000 + 2000; 
+        turnTimer = setTimeout(() => {
+            isLookingBack = true;
+            catImg.src = "https://postfiles.pstatic.net/MjAyNjA0MjVfMTAg/MDAxNzc3MTE0NTMxNDcx.HJ_qccByrePEjKTnw26b2ON2U3ua3dkcqSP6qr8HvYwg.i-sEpnRZahsxDKsnoTFNHwvTPE8HTd284hQ4iW9gKLUg.PNG/KakaoTalk_20260425_194851917_01.png?type=w3840"; // 돌아보는 사진으로 교체
+            
+            // 2초 동안 안 때리고 버티면 다시 뒷모습으로
+            safeTimer = setTimeout(() => {
+                isLookingBack = false;
+                catImg.src = "https://postfiles.pstatic.net/MjAyNjA0MjVfMTYg/MDAxNzc3MTE0NTMxNjA2.UsvQ1YRhi8kYXBURsy65zNTAVQEpoGCHSjEjbvUaf08g.hs81l-ySKKTUR7osol0jR4my5RvKZ-R2mEhzbzzcBkAg.PNG/KakaoTalk_20260425_194851917.png?type=w3840"; // 뒷모습으로 교체
+                randomTurn(); // 다시 랜덤 타이머 시작
+            }, 2000);
+
+        }, randomTime);
+    }
+
+    function gameOver() {
+        clearTimeout(turnTimer);
+        clearTimeout(safeTimer);
+        gameOverScreen.style.display = "flex";
+    }
+
+    function resetGame() {
+        score = 0;
+        scoreDisplay.innerText = score;
+        isLookingBack = false;
+        catImg.src = "https://postfiles.pstatic.net/MjAyNjA0MjVfMTYg/MDAxNzc3MTE0NTMxNjA2.UsvQ1YRhi8kYXBURsy65zNTAVQEpoGCHSjEjbvUaf08g.hs81l-ySKKTUR7osol0jR4my5RvKZ-R2mEhzbzzcBkAg.PNG/KakaoTalk_20260425_194851917.png?type=w3840";
+        gameOverScreen.style.display = "none";
+        randomTurn();
+    }
+
+    // 게임 최초 시작
+    randomTurn();
+</script>
+
+</body>
+</html>
